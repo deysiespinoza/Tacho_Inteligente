@@ -1,0 +1,82 @@
+{
+  "version": "2.0",
+  "timestamp": "2026-11-10T00:32:17.980729",
+  "modelo": "MobileNetV2 Fine-Tuning",
+  "clases": [
+    "metal",
+    "organico",
+    "otros",
+    "papel_carton",
+    "peligroso",
+    "plastico",
+    "vidrio"
+  ],
+  "img_size": [
+    224,
+    224
+  ],
+  "bin_map": {
+    "plastico": "Tacho blanco (pl\u00e1sticos)",
+    "papel_carton": "Tacho azul (papel y cart\u00f3n)",
+    "vidrio": "Tacho verde (vidrio)",
+    "metal": "Tacho amarillo (metales)",
+    "organico": "Tacho marr\u00f3n (org\u00e1nicos)",
+    "peligroso": "Tacho rojo (residuos peligrosos)",
+    "otros": "Tacho negro (no aprovechables)"
+  },
+  "preprocesado": "recorte central cuadrado y resize a img_size; valores 0-255 (el modelo normaliza internamente)",
+  "datasets": [
+    "Roboflow garbage-classification v6",
+    "Roboflow waste-classification v3",
+    "RealWaste (UCI, CC BY 4.0)",
+    "TACO (recortes)"
+  ],
+  "metricas_test": [
+    {
+      "Modelo": "CNN propia",
+      "Test Accuracy": 0.7738,
+      "F1 macro": 0.7243,
+      "Precision macro": 0.7115,
+      "Recall macro": 0.7497,
+      "Acc ds1": 0.772,
+      "Acc ds2": 0.897,
+      "Acc rw": 0.765,
+      "Acc taco": 0.467,
+      "Params": "1,266,919",
+      "Tama\u00f1o .keras (MB)": 14.7,
+      "Tiempo (min)": 39.3
+    },
+    {
+      "Modelo": "MobileNetV2 FE",
+      "Test Accuracy": 0.888,
+      "F1 macro": 0.86,
+      "Precision macro": 0.8668,
+      "Recall macro": 0.8563,
+      "Acc ds1": 0.944,
+      "Acc ds2": 0.973,
+      "Acc rw": 0.831,
+      "Acc taco": 0.601,
+      "Params": "2,427,975",
+      "Tama\u00f1o .keras (MB)": 11.1,
+      "Tiempo (min)": 14.5
+    },
+    {
+      "Modelo": "MobileNetV2 Fine-Tuning",
+      "Test Accuracy": 0.8964,
+      "F1 macro": 0.8704,
+      "Precision macro": 0.8693,
+      "Recall macro": 0.8723,
+      "Acc ds1": 0.956,
+      "Acc ds2": 0.972,
+      "Acc rw": 0.849,
+      "Acc taco": 0.612,
+      "Params": "2,427,975",
+      "Tama\u00f1o .keras (MB)": 24.0,
+      "Tiempo (min)": 23.5
+    }
+  ],
+  "entorno": {
+    "tensorflow": "2.21.0",
+    "python": "3.13.16"
+  }
+}
