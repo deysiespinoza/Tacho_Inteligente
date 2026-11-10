@@ -1,5 +1,5 @@
 // Service worker: guarda la app y el modelo en caché para que funcione sin internet
-const VERSION = 'tacho-v2';
+const VERSION = 'tacho-v3';
 const BASE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
               'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js'];
 

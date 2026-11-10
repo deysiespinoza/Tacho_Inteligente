@@ -123,11 +123,13 @@ function mostrar(p, guardar) {
   const chip = $('chip'); chip.hidden = false;
   if (conf < UMBRAL) {
     chip.style.background = 'rgba(30,20,50,.85)'; chip.style.color = '#fff';
-    chip.innerHTML = `<span>🤔 No estoy seguro</span><span>${pct} %</span>`;
+    const bq = BINS[c];
+    chip.innerHTML = `<span>🤔 Quizá ${esc(nombre)}${bq ? ' → ' + esc(bq.nombre.toLowerCase()) : ''}</span><span>${pct} %</span>`;
     html = `<div class="res">${mascota('otros', 78, 'duda')}
       <div class="txt"><p class="peq" style="color:var(--suave)">Mejor otra foto</p>
       <h2>No estoy seguro (${pct} %)</h2>
-      <p class="peq" style="color:var(--suave)">Acerca el objeto, mejora la luz o cambia el ángulo.</p>
+      <p style="margin:4px 0;font-weight:600">Podría ser: ${esc(nombre)}${bq ? ' → tacho ' + esc(bq.nombre.toLowerCase()) : ''}</p>
+      <p class="peq" style="color:var(--suave)">Muestra el objeto completo, de cerca y con buena luz para estar seguro.</p>
       <div class="top3" style="color:var(--morado)">${top3}</div></div></div>`;
   } else {
     const b = BINS[c] || { nombre: (meta.bin_map && meta.bin_map[c]) || '—', g: ['#7b4fd0', '#b48cf0'], txt: '#fff', ej: '' };
