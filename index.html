@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6a35c4">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Tacho Inteligente</title>
+<style>
+  :root { --morado:#6a35c4; --morado2:#9a6be8; --lila:#c9b2ec; --fondo:#f5f0fc; --tarjeta:#ffffff;
+          --texto:#241a3a; --suave:#7b7192; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; min-height:100%; }
+  body { font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--fondo); color:var(--texto); }
+  h1, h2, h3, p { margin:0; }
+  button { font:inherit; cursor:pointer; border:0; }
+
+  /* ---------- Onboarding ---------- */
+  #onb { position:fixed; inset:0; z-index:50; background:#fff; display:flex; flex-direction:column;
+         padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  #onb[hidden] { display:none; }
+  .slide { flex:1; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px 28px; gap:18px; }
+  .slide.activa { display:flex; }
+  .slide.portada { align-items:flex-start; text-align:left; justify-content:flex-start; padding-top:12vh; background:linear-gradient(#fff 45%, #e9ddf9); }
+  .portada h1 { font-size:2.6rem; letter-spacing:-1px; }
+  .portada p { font-size:1.05rem; color:var(--suave); max-width:16em; }
+  .nube { position:relative; width:100%; margin-top:auto; height:230px; }
+  .nube svg { position:absolute; }
+  .blob { width:230px; height:230px; border-radius:46% 54% 58% 42% / 52% 44% 56% 48%; display:grid; place-items:center; }
+  .slide h2 { font-size:1.55rem; line-height:1.25; }
+  .slide p.sub { color:var(--suave); }
+  .onb-pie { padding:12px 24px 24px; display:grid; gap:14px; }
+  .puntos { display:flex; gap:7px; justify-content:center; }
+  .puntos i { width:7px; height:7px; border-radius:50%; background:#d9d0ea; }
+  .puntos i.on { background:var(--morado); }
+  .btn-main { width:100%; padding:15px; border-radius:14px; background:var(--morado); color:#fff; font-weight:600; font-size:1rem; }
+  .btn-main:disabled { opacity:.5; }
+  .btn-sec { padding:13px; border-radius:14px; background:#efe7fb; color:var(--morado); font-weight:600; }
+  .btn-sec:disabled { opacity:.5; }
+
+  /* ---------- Vistas ---------- */
+  .vista { display:none; max-width:520px; margin:0 auto; padding:calc(16px + env(safe-area-inset-top)) 16px 110px; }
+  .vista.activa { display:block; }
+  .fecha { font-size:1.35rem; font-weight:600; }
+  .fecha small { display:block; font-size:.9rem; font-weight:400; color:var(--suave); margin-top:2px; }
+  h3.sec { margin:20px 0 10px; font-size:1.1rem; }
+  .hero { margin-top:14px; border-radius:22px; padding:18px 16px 18px 20px; color:#fff; display:flex; align-items:center; gap:10px;
+          background:linear-gradient(135deg,#7b4fd0,#b48cf0); }
+  .hero b { font-size:1.15rem; display:block; margin-bottom:4px; }
+  .hero span { font-size:.85rem; opacity:.9; }
+  .visor { position:relative; background:#1d1530; border-radius:24px; overflow:hidden; aspect-ratio:1/1; }
+  .visor video, .visor img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .visor[data-vacio="1"]::after { content:"📷"; position:absolute; inset:0; display:grid; place-items:center; font-size:3rem; opacity:.5; }
+  .marco { position:absolute; inset:14%; border:3px dashed rgba(255,255,255,.85); border-radius:18px; pointer-events:none; }
+  .pill { position:absolute; left:10px; right:10px; bottom:10px; z-index:3; padding:11px 14px; border-radius:16px; display:flex;
+          justify-content:space-between; align-items:center; gap:8px; font-weight:700; font-size:.95rem; box-shadow:0 4px 14px rgba(0,0,0,.3); }
+  .pill[hidden] { display:none; }
+  .fila { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+  .fila .ancho { grid-column:1 / -1; }
+  label.btn-sec { display:block; text-align:center; }
+  input[type=file] { display:none; }
+  .res { margin-top:14px; border-radius:22px; padding:18px; display:flex; align-items:center; gap:12px; background:#fff;
+         box-shadow:0 2px 12px rgba(90,50,160,.12); }
+  .res .txt { flex:1; min-width:0; }
+  .res .peq { font-size:.8rem; opacity:.85; }
+  .res h2 { font-size:1.45rem; margin:2px 0; line-height:1.15; }
+  .res .conf { font-size:.9rem; margin-top:6px; }
+  .barra { height:8px; border-radius:6px; background:rgba(255,255,255,.35); overflow:hidden; margin-top:6px; }
+  .barra i { display:block; height:100%; background:currentColor; border-radius:6px; }
+  .top3 { margin-top:10px; display:grid; gap:6px; }
+  .top3 div { display:grid; grid-template-columns:100px 1fr 40px; gap:8px; align-items:center; font-size:.8rem; }
+  #estado { font-size:.8rem; color:var(--suave); text-align:center; margin-top:14px; }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .tc { position:relative; border-radius:20px; padding:14px; min-height:160px; overflow:hidden; }
+  .tc h3 { font-size:1rem; text-align:right; }
+  .tc small { display:block; text-align:right; font-size:.75rem; opacity:.9; margin-top:2px; }
+  .tc .ej { position:absolute; left:80px; right:12px; bottom:12px; font-size:.72rem; line-height:1.25; text-align:right; opacity:.95; }
+  .tc svg { position:absolute; left:8px; bottom:8px; }
+  .tc .chip { position:absolute; left:12px; top:12px; width:20px; height:20px; border-radius:50%; border:3px solid rgba(255,255,255,.8); }
+
+  .tarjeta { background:#fff; border-radius:20px; padding:16px; box-shadow:0 2px 12px rgba(90,50,160,.1); }
+  .lista { display:grid; gap:2px; }
+  .lista .it { display:flex; align-items:center; gap:10px; padding:10px 2px; border-bottom:1px solid #f0eaf8; font-size:.95rem; }
+  .lista .it:last-child { border:0; }
+  .lista .it .d { width:12px; height:12px; border-radius:50%; flex:none; }
+  .lista .it .n { margin-left:auto; color:var(--suave); font-variant-numeric:tabular-nums; }
+  .lista .it small { color:var(--suave); }
+  .vacio { color:var(--suave); font-size:.9rem; text-align:center; padding:14px 0; }
+  .acerca p { margin:8px 0; font-size:.92rem; line-height:1.45; }
+  .acerca ul { margin:6px 0; padding-left:18px; font-size:.88rem; line-height:1.5; }
+  .centro { display:grid; place-items:center; margin:6px 0 10px; }
+
+  nav { position:fixed; left:0; right:0; bottom:0; z-index:20; background:#fff; border-radius:22px 22px 0 0;
+        box-shadow:0 -6px 20px rgba(80,40,140,.14); padding:8px 8px calc(8px + env(safe-area-inset-bottom)); }
+  nav .in { max-width:520px; margin:0 auto; display:flex; justify-content:space-around; }
+  nav button { background:none; display:grid; justify-items:center; gap:2px; padding:6px 12px; color:#9d92b5; font-size:.7rem; border-radius:14px; }
+  nav button span { font-size:1.3rem; filter:grayscale(1); opacity:.7; }
+  nav button.on { color:var(--morado); font-weight:700; background:#f1e9fd; }
+  nav button.on span { filter:none; opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- ============ ONBOARDING ============ -->
+<div id="onb" hidden>
+  <div class="slide portada activa">
+    <h1>Tacho<br>Inteligente</h1>
+    <p>Tu forma de reciclar bien: muestra el residuo y te decimos a qué tacho va.</p>
+    <div class="nube" id="nube"></div>
+  </div>
+  <div class="slide">
+    <div class="blob" style="background:#f8cde0" id="blob1"></div>
+    <h2>Cada residuo tiene su tacho</h2>
+    <p class="sub">Separar bien es un pequeño paso que cuida tu ciudad.</p>
+  </div>
+  <div class="slide">
+    <div class="blob" style="background:#bccaec" id="blob2"></div>
+    <h2>Apunta, escanea y listo</h2>
+    <p class="sub">La cámara reconoce el material y funciona sin internet.</p>
+  </div>
+  <div class="onb-pie">
+    <div class="puntos" id="puntos"><i class="on"></i><i></i><i></i></div>
+    <button class="btn-main" id="btnSig">Siguiente</button>
+  </div>
+</div>
+
+<!-- ============ VISTAS ============ -->
+<section id="v-scan" class="vista activa">
+  <div class="fecha" id="fecha"></div>
+  <div class="hero">
+    <div id="heroTxt" style="flex:1"></div>
+    <div id="heroMasc"></div>
+  </div>
+
+  <h3 class="sec">Escanear residuo</h3>
+  <div class="visor" id="visor" data-vacio="1">
+    <video id="video" autoplay playsinline muted hidden></video>
+    <img id="foto" alt="" hidden>
+    <div class="marco"></div>
+    <div id="chip" class="pill" hidden></div>
+  </div>
+  <div class="fila">
+    <button class="btn-main ancho" id="btnCam">Activar cámara</button>
+    <button class="btn-sec" id="btnClasificar" disabled>Clasificar</button>
+    <button class="btn-sec" id="btnAuto" disabled>Modo en vivo</button>
+    <button class="btn-sec" id="btnGirar" disabled>Girar cámara</button>
+    <label class="btn-sec" for="archivo">Subir foto</label>
+    <input id="archivo" type="file" accept="image/*">
+  </div>
+  <div id="resultado"></div>
+  <div id="estado">Cargando…</div>
+</section>
+
+<section id="v-tachos" class="vista">
+  <div class="fecha">Tachos<small>Qué va en cada uno</small></div>
+  <div class="grid" id="gridTachos" style="margin-top:14px"></div>
+</section>
+
+<section id="v-hist" class="vista">
+  <div class="fecha">Historial<small>Lo que has clasificado en este celular</small></div>
+  <h3 class="sec">Por tipo</h3>
+  <div class="tarjeta"><div class="lista" id="histTipos"></div></div>
+  <h3 class="sec">Recientes</h3>
+  <div class="tarjeta"><div class="lista" id="histRec"></div></div>
+  <div class="fila"><button class="btn-sec ancho" id="btnBorrar">Borrar historial</button></div>
+</section>
+
+<section id="v-acerca" class="vista acerca">
+  <div class="fecha">Acerca de<small>Cómo funciona</small></div>
+  <div class="centro" id="acercaMasc"></div>
+  <div class="tarjeta">
+    <p><b>Tacho Inteligente</b> reconoce el tipo de residuo con una red neuronal convolucional (CNN) y te indica el tacho.</p>
+    <p>El modelo corre <b>dentro de tu celular</b>: las fotos no se envían a ningún servidor.</p>
+    <p id="acercaModelo"></p>
+    <p><b>Datos de entrenamiento</b></p>
+    <ul id="acercaDatos"></ul>
+    <p style="font-size:.8rem;color:var(--suave)">RealWaste: Single, Iranmanesh &amp; Raad (2023), UCI ML Repository, CC BY 4.0. TACO: Proença &amp; Simões (2020). Los colores de los tachos son una referencia; verifica la normativa vigente de tu municipio.</p>
+    <p style="font-size:.8rem;color:var(--suave)">Proyecto del curso de Ingeniería del Conocimiento (IS056B), UNCP.</p>
+  </div>
+</section>
+
+<nav><div class="in">
+  <button data-v="scan" class="on"><span>📷</span>Escanear</button>
+  <button data-v="tachos"><span>🗑️</span>Tachos</button>
+  <button data-v="hist"><span>📅</span>Historial</button>
+  <button data-v="acerca"><span>ℹ️</span>Acerca</button>
+</div></nav>
+
+<canvas id="lienzo" hidden></canvas>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

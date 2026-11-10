@@ -1,0 +1,17 @@
+{
+  "name": "Tacho Inteligente",
+  "short_name": "Tacho",
+  "description": "Clasifica residuos sólidos con la cámara y dice a qué tacho van.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#6a35c4",
+  "theme_color": "#6a35c4",
+  "lang": "es",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
